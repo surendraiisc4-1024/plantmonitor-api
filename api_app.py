@@ -1,5 +1,5 @@
 import pandas as pd
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import threading
 import time
 import os
@@ -12,6 +12,7 @@ CSV_FILE = "data.csv"
 REFRESH_INTERVAL = 5
 
 
+# 🔁 Read CSV continuously (fallback mode)
 def read_csv_continuously():
     global latest_data
 
@@ -31,6 +32,7 @@ def read_csv_continuously():
 
             latest_data = {
                 "status": "success",
+                "source": "csv",
                 "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "data": row.to_dict()
             }
@@ -44,11 +46,12 @@ def read_csv_continuously():
         time.sleep(REFRESH_INTERVAL)
 
 
-# 🚀 START THREAD HERE (IMPORTANT FIX)
+# 🚀 START THREAD (important for Render)
 thread = threading.Thread(target=read_csv_continuously, daemon=True)
 thread.start()
 
 
+# 📡 GET API (mobile app will use this)
 @app.route('/data', methods=['GET'])
 def get_data():
     if not latest_data:
@@ -60,6 +63,31 @@ def get_data():
     return jsonify(latest_data)
 
 
+# 🔥 POST API (PC will send live data here)
+@app.route('/update', methods=['POST'])
+def update_data():
+    global latest_data
+
+    try:
+        incoming = request.json
+
+        latest_data = {
+            "status": "success",
+            "source": "live",
+            "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "data": incoming
+        }
+
+        return jsonify({"message": "Data updated successfully"})
+
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        })
+
+
+# 🏠 Home check
 @app.route('/')
 def home():
-    return "Plant Monitor API Running"
+    return "Plant Monitor API Running 🚀"
