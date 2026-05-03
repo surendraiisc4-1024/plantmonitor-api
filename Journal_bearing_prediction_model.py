@@ -15,7 +15,8 @@ pd.set_option('display.max_colwidth', None)
 # =========================
 # 1. Load Filtered Data
 # =========================
-df1 = pd.read_csv("Journalbearing_filtered_data.csv")
+#df1 = pd.read_csv("Journalbearing_filtered_data.csv")
+df1 = pd.read_csv("MDBFP_BRG - 2025Jun13 0000 to 2025Jun13  2300 @1 Min.csv")
 
 # Drop missing values
 df1 = df1.dropna()
@@ -24,8 +25,8 @@ df1 = df1.dropna()
 # 2. Create Features
 # =========================
 df=df1.loc[
-    ((df1['1BFPDTA_SPD_MV3.OUT.Average'] >4100) &
-    (df1['1BFPDTA_SPD_MV3.OUT.Average'] <4200))]
+    ((df1['1LAC23CS101_XQ50.OUT.Average'] >4100) &
+    (df1['1LAC23CS101_XQ50.OUT.Average'] <4200))]
 
 # Combine discharge pressure (if both exist)
 #if '1LAB21CP102XQ10.OUT.Average' in df.columns and '1LAB21CP101_XQ01.Out.Average' in df.columns:
